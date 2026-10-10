@@ -1,0 +1,5 @@
+-r src/requirements.txt
+uvicorn[standard]>=0.30
+pytest>=8
+httpx2
+jsonschema>=4.23

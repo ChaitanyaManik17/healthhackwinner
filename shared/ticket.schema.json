@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ChaitanyaManik17/healthhackwinner/shared/ticket.schema.json",
+  "title": "Ticket",
+  "description": "One routed patient request. The classifier (ai/) produces the classification fields, the backend adds ids, status and timestamps, and both frontends display it. Change only via docs/decisions.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ticket_id",
+    "room",
+    "raw_text",
+    "language",
+    "category",
+    "department",
+    "priority",
+    "confidence",
+    "escalate_to_nurse",
+    "reason",
+    "status",
+    "created_at"
+  ],
+  "properties": {
+    "ticket_id": { "type": "string", "description": "Server-generated, e.g. t_0001" },
+    "room": { "type": "string", "description": "Synthetic room label, e.g. 412B" },
+    "raw_text": { "type": "string", "minLength": 1, "maxLength": 1000, "description": "What the patient typed or said" },
+    "language": { "type": "string", "description": "ISO 639-1 code of the request language, e.g. en, es" },
+    "category": {
+      "type": "string",
+      "enum": ["housekeeping", "food", "tech", "urgent_clinical", "unclear"]
+    },
+    "department": {
+      "type": "string",
+      "enum": ["housekeeping", "food", "unit_clerk_it", "nurse"]
+    },
+    "priority": { "type": "string", "enum": ["low", "normal", "high"] },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "escalate_to_nurse": { "type": "boolean", "description": "True whenever department is nurse" },
+    "reason": { "type": "string", "maxLength": 300, "description": "Short, staff-facing reason for the routing" },
+    "status": { "type": "string", "enum": ["new", "acknowledged", "done"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

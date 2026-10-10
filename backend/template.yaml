@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Call Bell Router - API (FastAPI on Lambda), HTTP API, DynamoDB tickets table. Synthetic data only.
+
+Parameters:
+  CorsOrigins:
+    Type: String
+    Default: "*"
+    Description: Comma-separated allowed frontend origins (tighten once frontends are hosted)
+  BedrockModelId:
+    Type: String
+    Default: anthropic.claude-opus-5-5
+    Description: Bedrock model used by the classifier (confirm in docs/decisions.md)
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Architectures: [arm64]
+    MemorySize: 512
+    Timeout: 15
+
+Resources:
+  TicketsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: call-bell-tickets
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: ticket_id
+          AttributeType: S
+        - AttributeName: department
+          AttributeType: S
+        - AttributeName: created_at
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ticket_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: department-created_at
+          KeySchema:
+            - AttributeName: department
+              KeyType: HASH
+            - AttributeName: created_at
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    # CORS is handled by FastAPI's CORSMiddleware (env CORS_ORIGINS), not here.
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.main.handler
+      Environment:
+        Variables:
+          TICKETS_TABLE: !Ref TicketsTable
+          CORS_ORIGINS: !Ref CorsOrigins
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TicketsTable
+        # Phase 1 (task 1.4): add Bedrock invoke permission once the classifier is wired in.
+      Events:
+        Root:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /
+            Method: ANY
+        Proxy:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /{proxy+}
+            Method: ANY
+
+Outputs:
+  ApiUrl:
+    Description: Base URL of the API (share with the team)
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  TicketsTableName:
+    Value: !Ref TicketsTable

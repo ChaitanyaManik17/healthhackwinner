@@ -1,0 +1,179 @@
+openapi: 3.0.3
+info:
+  title: Call Bell Router API
+  version: 0.1.0
+  description: >
+    Contract between the patient screen, the staff dashboard, the classifier and the backend.
+    Synthetic data only. Change via docs/decisions.md.
+servers:
+  - url: http://localhost:8000
+    description: Local
+paths:
+  /health:
+    get:
+      summary: Liveness check
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+                  service: { type: string, example: call-bell-router }
+                  version: { type: string, example: 0.1.0 }
+  /requests:
+    post:
+      summary: Patient submits a request; returns the routed ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PatientRequest" }
+      responses:
+        "201":
+          description: Ticket created and routed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ticket" }
+        "422": { $ref: "#/components/responses/Error" }
+  /tickets:
+    get:
+      summary: List tickets for a department
+      parameters:
+        - in: query
+          name: department
+          schema: { $ref: "#/components/schemas/Department" }
+        - in: query
+          name: status
+          schema: { $ref: "#/components/schemas/Status" }
+      responses:
+        "200":
+          description: Tickets, high priority first, then newest first
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TicketList" }
+  /tickets/{ticket_id}:
+    patch:
+      summary: Update ticket status
+      parameters:
+        - in: path
+          name: ticket_id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { $ref: "#/components/schemas/Status" }
+      responses:
+        "200":
+          description: Updated ticket
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ticket" }
+        "404": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+  /tickets/updates:
+    get:
+      summary: Tickets created or changed since a timestamp (polled every 2 s)
+      parameters:
+        - in: query
+          name: since
+          required: true
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: Changed tickets
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/TicketList"
+                  - type: object
+                    properties:
+                      server_time: { type: string, format: date-time }
+  /classify:
+    post:
+      summary: Classify text only (no ticket stored); for testing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string, minLength: 1, maxLength: 1000 }
+                language: { type: string, example: es }
+      responses:
+        "200":
+          description: Classification
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Classification" }
+components:
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail: { type: string }
+  schemas:
+    Category:
+      type: string
+      enum: [housekeeping, food, tech, urgent_clinical, unclear]
+    Department:
+      type: string
+      enum: [housekeeping, food, unit_clerk_it, nurse]
+    Priority:
+      type: string
+      enum: [low, normal, high]
+    Status:
+      type: string
+      enum: [new, acknowledged, done]
+    PatientRequest:
+      type: object
+      required: [room, text]
+      properties:
+        room: { type: string, example: 412B }
+        text: { type: string, minLength: 1, maxLength: 1000, example: Can I get an extra pillow? }
+        language: { type: string, example: en }
+        source: { type: string, enum: [text, quick_button, voice], default: text }
+    Classification:
+      type: object
+      required: [language, category, department, priority, confidence, escalate_to_nurse, reason]
+      properties:
+        language: { type: string, example: en }
+        category: { $ref: "#/components/schemas/Category" }
+        department: { $ref: "#/components/schemas/Department" }
+        priority: { $ref: "#/components/schemas/Priority" }
+        confidence: { type: number, minimum: 0, maximum: 1 }
+        escalate_to_nurse: { type: boolean }
+        reason: { type: string, maxLength: 300 }
+    Ticket:
+      allOf:
+        - $ref: "#/components/schemas/Classification"
+        - type: object
+          required: [ticket_id, room, raw_text, status, created_at]
+          properties:
+            ticket_id: { type: string, example: t_0001 }
+            room: { type: string, example: 412B }
+            raw_text: { type: string }
+            status: { $ref: "#/components/schemas/Status" }
+            created_at: { type: string, format: date-time }
+            updated_at: { type: string, format: date-time }
+    TicketList:
+      type: object
+      properties:
+        tickets:
+          type: array
+          items: { $ref: "#/components/schemas/Ticket" }
