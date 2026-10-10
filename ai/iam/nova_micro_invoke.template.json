@@ -1,0 +1,11 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "InvokeSelectedNovaMicro",
+      "Effect": "Allow",
+      "Action": "bedrock:InvokeModel",
+      "Resource": "arn:aws:bedrock:WORKSHOP_REGION::foundation-model/amazon.nova-micro-v1:0"
+    }
+  ]
+}

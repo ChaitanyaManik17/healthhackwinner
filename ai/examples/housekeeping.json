@@ -1,0 +1,14 @@
+{
+  "ticket_id": "t_example_housekeeping",
+  "room": "SYNTHETIC-01",
+  "raw_text": "Can I get an extra pillow?",
+  "language": "en",
+  "category": "housekeeping",
+  "department": "housekeeping",
+  "priority": "normal",
+  "confidence": 0.95,
+  "escalate_to_nurse": false,
+  "reason": "Ordinary bedding request.",
+  "status": "new",
+  "created_at": "2026-10-09T14:03:00Z"
+}

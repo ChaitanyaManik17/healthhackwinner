@@ -1,0 +1,3 @@
+# SDK version tested by the Phase 0 offline suite. No cloud access is required
+# to run the validator or unit tests.
+boto3==1.40.50

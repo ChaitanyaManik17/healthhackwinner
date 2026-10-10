@@ -1,0 +1,14 @@
+{
+  "ticket_id": "t_example_unclear",
+  "room": "SYNTHETIC-01",
+  "raw_text": "I need help.",
+  "language": "en",
+  "category": "unclear",
+  "department": "nurse",
+  "priority": "high",
+  "confidence": 0.3,
+  "escalate_to_nurse": true,
+  "reason": "Request is vague; nursing review is needed.",
+  "status": "new",
+  "created_at": "2026-10-09T14:03:00Z"
+}

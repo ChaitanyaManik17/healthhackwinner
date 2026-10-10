@@ -1,0 +1,23 @@
+{
+  "selection_status": "proposed_pending_workshop_region_and_live_call",
+  "provider": "Amazon",
+  "model_name": "Amazon Nova Micro",
+  "model_id": "amazon.nova-micro-v1:0",
+  "api": "Converse",
+  "region": null,
+  "reference_region": "us-east-1",
+  "reference_region_is_not_confirmed_workshop_region": true,
+  "alternative_model_id": "amazon.nova-lite-v1:0",
+  "alternative_requires_separate_access_and_region_check": true,
+  "minimum_non_nurse_confidence": 0.8,
+  "confidence_threshold_status": "proposed_uncalibrated_not_a_safety_guarantee",
+  "supported_language": "en",
+  "synthetic_data_only": true,
+  "live_call_completed": false,
+  "sources": [
+    "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-amazon-nova-micro.html",
+    "https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-runtime_example_bedrock-runtime_Converse_AmazonNovaText_section.html",
+    "https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html",
+    "https://aws.amazon.com/bedrock/pricing/"
+  ]
+}
