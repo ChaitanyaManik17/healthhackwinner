@@ -1,0 +1,14 @@
+{
+  "ticket_id": "t_example_tech",
+  "room": "SYNTHETIC-01",
+  "raw_text": "The TV remote does not work.",
+  "language": "en",
+  "category": "tech",
+  "department": "unit_clerk_it",
+  "priority": "low",
+  "confidence": 0.95,
+  "escalate_to_nurse": false,
+  "reason": "Nonclinical TV amenity problem.",
+  "status": "new",
+  "created_at": "2026-10-09T14:03:00Z"
+}

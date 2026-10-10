@@ -1,0 +1,14 @@
+{
+  "ticket_id": "t_example_urgent_clinical",
+  "room": "SYNTHETIC-01",
+  "raw_text": "My chest feels tight.",
+  "language": "en",
+  "category": "urgent_clinical",
+  "department": "nurse",
+  "priority": "high",
+  "confidence": 0.95,
+  "escalate_to_nurse": true,
+  "reason": "Reported chest tightness requires nursing review.",
+  "status": "new",
+  "created_at": "2026-10-09T14:03:00Z"
+}
